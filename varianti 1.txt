@@ -1,0 +1,87 @@
+
+Option 1
+10 assignments. 3 points each. Total 30 points. Intermediate relies on live sql
+schemes.
+
+
+
+1. Output the description of the PRODUCTS and COSTS tables of the sh scheme.
+
+DESCRIBE sh.products;
+DESCRIBE sh.costs;
+
+2. Enter your first and last name, the length of the name and (31-12)*6 on the dual table
+Result. 
+
+SELECT 'YourFirstName YourLastName', LENGTH('YourFirstName YourLastName'), (31-12)*6 FROM dual;
+
+3. Extract the product name (all characters should be uppercase), product category (all characters should be lowercase) from the SH scheme's PRODUCTS table.
+Sort by product name in descending order. 
+
+SELECT UPPER(prod_name) AS "Product Name", LOWER(prod_category) AS "Product Category"
+FROM sh.products
+ORDER BY UPPER(prod_name) DESC;
+
+4. Extract all column data for the first 10 records from the sh schema COSTS table.
+
+SELECT *
+FROM sh.costs
+WHERE ROWNUM <= 10;
+
+5. Extract the total unit price (unit_price) from the COSTS table of the sh scheme
+Round up to the whole, only in the entries where the unit cost
+(unit_cost) is in the range from 600 to 700 inclusive. Title the resulting column
+SUM_PRICE.
+
+SELECT ROUND(unit_price) AS SUM_PRICE
+FROM sh.costs
+WHERE unit_cost BETWEEN 600 AND 700;
+
+
+
+6. Extract the product name, product category, product category id, product subcategory and product category description (PROD_CATEGORY_DESC) from the PRODUCTS table of the sh scheme. Only for products with Product Category Photo or Product Category ID 201 or 202 or 203. Sort data in ascending order of Product Category ID.
+
+SELECT 
+  prod_name AS product_name,
+  prod_category AS product_category,
+  prod_category_id,
+  prod_subcategory,
+  prod_category_desc
+FROM sh.products
+WHERE 
+  prod_category in 'Photo' or prod_category_id in ('201', '202', '203')
+ORDER BY prod_category_id ASC;
+
+
+7. Output the balance of the maximum length of the PROD_NAME_ column of the PRODUCTS table of the sh scheme to 6.
+
+select mod(max(length(prod_name)),6) as mod
+from sh.products;
+
+8. Extract non-duplicated product subcategory description (PROD_SUBCATEGORY_DESC) from sh schema's PRODUCTS table and artificially created MYCATEGORY column according to PROD_SUBCATEGORY_DESC: CD-ROM - A, Accessories - B, Memory - C and K for others.
+
+SELECT DISTINCT PROD_SUBCATEGORY_DESC, 
+       CASE 
+           WHEN PROD_SUBCATEGORY_DESC = 'CD-ROM' THEN 'A' 
+           WHEN PROD_SUBCATEGORY_DESC = 'Accessories' THEN 'B' 
+           WHEN PROD_SUBCATEGORY_DESC = 'Memory' THEN 'C' 
+           ELSE 'K' 
+       END AS MYCATEGORY 
+FROM sh.products;
+
+
+9. Extract the channel ID and average unit cost (unit_cost) grouped by channel ID from the COSTS table of the sh_ schema. Sort the data grouped by channel id in descending order of average unit spend.
+
+SELECT channel_id, AVG(unit_cost) AS avg_unit_cost
+FROM sh_.costs
+GROUP BY channel_id
+ORDER BY avg_unit_cost DESC;
+
+
+10. Extract the product id, product name, unit price, and time id (TIME_ID) date of the closest Friday from the PRODUCTS and COSTS tables of the sh schema. Only for products with a unit cost between 200 and 300 inclusive and a product category idea of ​​either 201 or 202. Use the using construct of join.
+
+SELECT P.PROD_ID,P.PROD_NAME,C.UNIT_PRICE,NEXT_DAY(C.TIME_ID,'FRIDAY')
+FROM SH.PRODUCTS P
+JOIN SH.COSTS C
+ON P.PROD_ID = C.PROD_ID
+WHERE P.PROD_CATEGORY_ID IN (201,202) AND C.UNIT_COST BETWEEN 200 AND 300
